@@ -3,12 +3,13 @@ package main
 import (
 	"bufio"
 	"os"
+	"progetto-algoritmi/entita"
 )
 
 func main() {
 
 	// Inizializza il piano
-	p := piano.NuovoPiano()
+	p := entita.NuovoPiano()
 
 	// Legge comandi dall'input
 	scanner := bufio.NewScanner(os.Stdin)

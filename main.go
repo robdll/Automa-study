@@ -1,21 +1,24 @@
 package main
 
 import (
-	"bufio"
-	"os"
 	"progetto-algoritmi/entita"
 )
 
-func main() {
 
-	// Inizializza il piano
+func main() {
+	// Crea un nuovo piano
 	p := entita.NuovoPiano()
 
-	// Legge comandi dall'input
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-			comando := scanner.Text()
-			p.EseguiComando(comando)
-	}
+	// Aggiunge automi
+	p.AggiungiAutoma(0, 0, "automa1")
+	p.AggiungiAutoma(-1, -1, "automa2")
 
+	// Aggiunge ostacoli
+	p.AggiungiOstacolo(entita.Rettangolo{
+		AngoloBassoSinistro: [2]int{1, 1},
+		AngoloAltoDestro:    [2]int{3, 3},
+	})
+
+	// Stampa il piano graficamente
+	p.StampaGrafica()
 }

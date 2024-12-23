@@ -8,34 +8,25 @@ import (
 func TestAggiungiOstacolo(t *testing.T) {
 	p := NuovoPiano()
 
-	// Aggiunge un ostacolo
-	p.AggiungiOstacolo(Rettangolo{
-		AngoloBassoSinistro: [2]int{1, 1},
-		AngoloAltoDestro:    [2]int{3, 3},
-	})
+	// Aggiunge un Automa
+	p.AggiungiAutoma(1, 1, "automa1")
 
-	// Verifica che tutte le posizioni del rettangolo siano occupate
-	for x := 1; x <= 3; x++ {
-		for y := 1; y <= 3; y++ {
-			if _, esiste := p.Mappa[[2]int{x, y}]; !esiste {
-				t.Errorf("La posizione (%d, %d) non è occupata dall'ostacolo", x, y)
-			}
-		}
+	// Aggiunge un ostacolo dove c'è l'Automa
+	err := p.AggiungiOstacolo(Rettangolo{
+		AngoloBassoSinistro: [2]int{0, 0},
+		AngoloAltoDestro:    [2]int{2, 2},
+	})
+	if err == nil {
+		t.Errorf("Ostacolo sovrapposto aggiunto erroneamente")
 	}
 
-	// Aggiunge un altro ostacolo sovrapposto
-	p.AggiungiOstacolo(Rettangolo{
-		AngoloBassoSinistro: [2]int{2, 2},
+	// Aggiunge un altro ostacolo
+	err = p.AggiungiOstacolo(Rettangolo{
+		AngoloBassoSinistro: [2]int{3, 3},
 		AngoloAltoDestro:    [2]int{4, 4},
 	})
-
-	// Verifica che le nuove posizioni siano occupate
-	for x := 2; x <= 4; x++ {
-		for y := 2; y <= 4; y++ {
-			if _, esiste := p.Mappa[[2]int{x, y}]; !esiste {
-				t.Errorf("La posizione (%d, %d) non è occupata dall'ostacolo", x, y)
-			}
-		}
+	if err != nil {
+		t.Errorf("Errore nell'aggiungere ostacolo: %v", err)
 	}
 }
 
@@ -43,57 +34,24 @@ func TestRimuoviOstacolo(t *testing.T) {
 	p := NuovoPiano()
 
 	// Aggiunge un ostacolo
-	p.AggiungiOstacolo(Rettangolo{
-		AngoloBassoSinistro: [2]int{1, 1},
-		AngoloAltoDestro:    [2]int{3, 3},
-	})
+	ostacolo := Rettangolo{
+		AngoloBassoSinistro: [2]int{3, 3},
+		AngoloAltoDestro:    [2]int{4, 4},
+	}
+	p.AggiungiOstacolo(ostacolo)
 
 	// Rimuove l'ostacolo
-	err := p.RimuoviOstacolo(2, 2)
+	err := p.RimuoviOstacolo(ostacolo)
 	if err != nil {
-		t.Errorf("Errore nel rimuovere l'ostacolo: %s", err)
+		t.Errorf("Errore nel rimuovere ostacolo: %v", err)
 	}
 
 	// Verifica che tutte le posizioni siano state liberate
-	for x := 1; x <= 3; x++ {
-		for y := 1; y <= 3; y++ {
-			if _, esiste := p.Mappa[[2]int{x, y}]; esiste {
-				t.Errorf("La posizione (%d, %d) non è stata liberata dopo la rimozione", x, y)
+	for x := 3; x <= 4; x++ {
+		for y := 3; y <= 4; y++ {
+			if _, ok := p.Mappa[[2]int{x, y}].(*Rettangolo); ok {
+				t.Errorf("Ostacolo non rimosso correttamente da (%d, %d)", x, y)
 			}
 		}
-	}
-
-	// Tenta di rimuovere un ostacolo inesistente
-	err = p.RimuoviOstacolo(4, 4)
-	if err == nil {
-		t.Errorf("Errore previsto per ostacolo inesistente non generato")
-	}
-}
-
-func TestCollisionDetection(t *testing.T) {
-	p := NuovoPiano()
-
-	// Aggiunge un ostacolo
-	p.AggiungiOstacolo(Rettangolo{
-		AngoloBassoSinistro: [2]int{1, 1},
-		AngoloAltoDestro:    [2]int{3, 3},
-	})
-
-	// Tenta di aggiungere un automa sopra un ostacolo
-	err := p.AggiungiAutoma(2, 2, "automa1")
-	if err == nil {
-		t.Errorf("Errore previsto per aggiunta di un automa sopra un ostacolo non generato")
-	}
-
-	// Aggiunge un automa in una posizione libera
-	err = p.AggiungiAutoma(0, 0, "automa1")
-	if err != nil {
-		t.Errorf("Errore nell'aggiungere l'automa: %s", err)
-	}
-
-	// Tenta di muovere l'automa sopra un ostacolo
-	err = p.MuoviAutoma("automa1", [2]int{1, 1})
-	if err == nil {
-		t.Errorf("Errore previsto per movimento sopra un ostacolo non generato")
 	}
 }

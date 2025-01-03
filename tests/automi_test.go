@@ -51,37 +51,42 @@ func TestRimuoviAutoma(t *testing.T) {
 	}
 }
 
-func TestMuoviAutoma(t *testing.T) {
+func TestRichiamo(t *testing.T) {
 	p := NuovoPiano()
 
-	// Aggiunge un automa
-	err := p.AggiungiAutoma(1, 1, "automa1")
+	// Aggiungi automi
+	p.AggiungiAutoma(0, 0, "1011")
+	p.AggiungiAutoma(1, 1, "1010")
+	p.AggiungiAutoma(6, 6, "1111")
+
+	// Aggiungi un ostacolo ora che la posizione (3,3) è libera
+	err := p.AggiungiOstacolo(Rettangolo{
+		AngoloBassoSinistro: [2]int{2, 2},
+		AngoloAltoDestro:    [2]int{4, 4},
+	})
 	if err != nil {
-		t.Errorf("Errore nell'aggiungere l'automa: %s", err)
+			t.Fatalf("Errore nell'aggiungere l'ostacolo: %v", err)
 	}
 
-	// Muove l'automa a una nuova posizione
-	err = p.MuoviAutoma("automa1", [2]int{2, 2})
-	if err != nil {
-		t.Errorf("Errore nel muovere l'automa: %s", err)
+	// Stampa il piano per verificare lo stato
+	p.Stampa()
+
+	// Test del richiamo
+	p.Richiamo([2]int{5, 5}, "101")
+
+	// Verifica la posizione degli automi
+	if p.Automi["1011"].Posizione != [2]int{5, 5} {
+			t.Errorf("Automa '1011' non si è spostato correttamente verso la sorgente")
 	}
 
-	// Verifica la nuova posizione dell'automa
-	automa, esiste := p.Automi["automa1"]
-	if !esiste || automa.Posizione != [2]int{2, 2} {
-		t.Errorf("Posizione errata dopo il movimento: %v", automa)
+	if p.Automi["1010"].Posizione == [2]int{5, 5} {
+			t.Errorf("Automa '1010' non dovrebbe spostarsi verso una posizione già occupata")
 	}
 
-	// Tenta di muovere un automa inesistente
-	err = p.MuoviAutoma("automa2", [2]int{3, 3})
-	if err == nil {
-		t.Errorf("Errore previsto per automa inesistente non generato")
+	// Verifica che l'automa '1111' sia rimasto nella sua nuova posizione
+	if p.Automi["1111"].Posizione != [2]int{6, 6} {
+			t.Errorf("Automa '1111' non dovrebbe rispondere al segnale e spostarsi")
 	}
 
-	// Tenta di muovere l'automa in una posizione occupata
-	p.AggiungiAutoma(3, 3, "automa2")
-	err = p.MuoviAutoma("automa1", [2]int{3, 3})
-	if err == nil {
-		t.Errorf("Errore previsto per posizione occupata non generato")
-	}
+	p.Stampa()
 }

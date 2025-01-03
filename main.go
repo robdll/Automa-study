@@ -42,5 +42,5 @@ func main() {
 	p.ElencaAutomi()
 
 	// Stampa il piano graficamente
-	p.StampaGrafica()
+	p.Stampa()
 }

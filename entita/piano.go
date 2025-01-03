@@ -78,16 +78,62 @@ func (p *Piano) Stato(xStr, yStr string) string {
 }
 
 // Operazione "Stampa": Stampa lo stato del piano
+// func (p *Piano) Stampa() {
+// 	fmt.Println("Automi:")
+// 	for nome, automa := range p.Automi {
+// 		fmt.Printf("%s: (%d, %d)\n", nome, automa.Posizione[0], automa.Posizione[1])
+// 	}
+
+// 	fmt.Println("Ostacoli:")
+// 	for _, rettangolo := range p.Ostacoli {
+// 		fmt.Printf("(%d, %d) -> (%d, %d)\n",
+// 			rettangolo.AngoloBassoSinistro[0], rettangolo.AngoloBassoSinistro[1],
+// 			rettangolo.AngoloAltoDestro[0], rettangolo.AngoloAltoDestro[1])
+// 	}
+// }
+
 func (p *Piano) Stampa() {
-	fmt.Println("Automi:")
-	for nome, automa := range p.Automi {
-		fmt.Printf("%s: (%d, %d)\n", nome, automa.Posizione[0], automa.Posizione[1])
+	minX, maxX, minY, maxY := 0, 0, 0, 0
+	for pos := range p.Mappa {
+			if pos[0] < minX {
+					minX = pos[0]
+			}
+			if pos[0] > maxX {
+					maxX = pos[0]
+			}
+			if pos[1] < minY {
+					minY = pos[1]
+			}
+			if pos[1] > maxY {
+					maxY = pos[1]
+			}
 	}
 
-	fmt.Println("Ostacoli:")
-	for _, rettangolo := range p.Ostacoli {
-		fmt.Printf("(%d, %d) -> (%d, %d)\n",
-			rettangolo.AngoloBassoSinistro[0], rettangolo.AngoloBassoSinistro[1],
-			rettangolo.AngoloAltoDestro[0], rettangolo.AngoloAltoDestro[1])
+	for y := maxY; y >= minY; y-- {
+			fmt.Printf("%2d  ", y)
+			for x := minX; x <= maxX; x++ {
+					key := [2]int{x, y}
+					if entita, ok := p.Mappa[key]; ok {
+							switch entita.(type) {
+							case *Automa:
+									fmt.Print("A  ")
+							case *Rettangolo:
+									fmt.Print("O  ")
+							}
+					} else {
+							fmt.Print(".  ")
+					}
+			}
+			fmt.Println()
 	}
+
+	fmt.Print("   ")
+	for x := minX; x <= maxX; x++ {
+			fmt.Printf("%2d", x)
+			if x < maxX {
+					fmt.Print(" ")
+			}
+	}
+	fmt.Println()
 }
+

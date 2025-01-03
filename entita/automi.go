@@ -1,6 +1,9 @@
 package entita
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Automa struct {
 	Nome     string   // Nome binario dell'automa
@@ -77,3 +80,40 @@ func (p *Piano) ElencaAutomi() {
 		fmt.Printf("Nome: %s, Posizione: (%d, %d)\n", nome, automa.Posizione[0], automa.Posizione[1])
 	}
 }
+
+
+func (p *Piano) Richiamo(sorgente [2]int, segnale string) {
+	// Mappa per tracciare le posizioni occupate durante il richiamo
+	posizioniOccupate := make(map[[2]int]bool)
+
+	for nome, automa := range p.Automi {
+			// Controlla se l'automa risponde al segnale
+			if !strings.HasPrefix(automa.Nome, segnale) {
+					continue
+			}
+
+			fmt.Printf("Automa '%s' risponde al segnale. Posizione attuale: %v\n", nome, automa.Posizione)
+
+			// Verifica se esiste un percorso valido
+			if !p.EsistePercorso(automa.Posizione, sorgente) {
+					fmt.Printf("Automa '%s' non può raggiungere la sorgente: %v\n", nome, sorgente)
+					continue
+			}
+
+			// Controlla se la posizione è già occupata
+			if posizioniOccupate[sorgente] {
+					fmt.Printf("Posizione %v già occupata, automa '%s' non può spostarsi.\n", sorgente, nome)
+					continue
+			}
+
+			// Sposta l'automa verso la sorgente
+			err := p.MuoviAutoma(nome, sorgente)
+			if err != nil {
+					fmt.Printf("Errore nel movimento dell'automa '%s': %v\n", nome, err)
+			} else {
+					fmt.Printf("Automa '%s' si è spostato a %v\n", nome, sorgente)
+					posizioniOccupate[sorgente] = true
+			}
+	}
+}
+

@@ -2,138 +2,105 @@ package entita
 
 import (
 	"fmt"
-	"strings"
 )
 
-// Struttura principale del piano
 type Piano struct {
 	Automi    map[string]*Automa
-	Ostacoli  []Rettangolo
-	Mappa     map[[2]int]interface{} // Mappa sparsa per posizioni
+	Ostacoli  []Ostacolo
+	Mappa     map[[2]int][]interface{}
 }
 
-// Crea un nuovo piano vuoto
-func NuovoPiano() *Piano {
+func Crea() *Piano {
+	fmt.Println("Creazione di un nuovo piano.")
 	return &Piano{
 		Automi:   make(map[string]*Automa),
-		Ostacoli: []Rettangolo{},
-		Mappa:    make(map[[2]int]interface{}),
+		Ostacoli: []Ostacolo{},
+		Mappa:    make(map[[2]int][]interface{}),
 	}
 }
 
-// Esegue un comando ricevuto
-func (p *Piano) EseguiComando(comando string) {
-	parts := strings.Fields(comando) // Divide il comando in parole
-	if len(parts) == 0 {
-		fmt.Println("Comando vuoto, ignorato.")
-		return
-	}
-
-	switch parts[0] {
-	case "c":
-		p.Crea()
-	case "s":
-		if len(parts) < 3 {
-			fmt.Println("Comando stato richiede coordinate.")
-			return
-		}
-		fmt.Println(p.Stato(parts[1], parts[2]))
-	case "S":
-		p.Stampa()
-	default:
-		fmt.Printf("Comando sconosciuto: %s\n", parts[0])
-	}
-}
-
-// Operazione "Crea": Resetta il piano
-func (p *Piano) Crea() {
-	p.Automi = make(map[string]*Automa)
-	p.Ostacoli = []Rettangolo{}
-	p.Mappa = make(map[[2]int]interface{})
-	fmt.Println("Piano resettato.")
-}
-
-// Operazione "Stato": Controlla cosa si trova in una posizione
-func (p *Piano) Stato(xStr, yStr string) string {
-	var x, y int
-	_, err := fmt.Sscanf(xStr, "%d", &x)
-	if err != nil {
-		return "Errore: Coordinata X non valida."
-	}
-	_, err = fmt.Sscanf(yStr, "%d", &y)
-	if err != nil {
-		return "Errore: Coordinata Y non valida."
-	}
-
+func (p *Piano) Stato(x, y int) {
+	fmt.Printf("Stato del piano in posizione: (%d, %d)\n", x, y)
 	key := [2]int{x, y}
-	if entita, ok := p.Mappa[key]; ok {
-		switch entita.(type) {
+	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+		switch entities[0].(type) {
 		case *Automa:
-			return "A" // Automa
-		case *Rettangolo:
-			return "O" // Ostacolo
+			fmt.Println("A")
+		case *Ostacolo:
+			fmt.Println("O")
 		}
+	} else {
+		fmt.Println("E")
 	}
-	return "E" // Vuoto
 }
 
-// Operazione "Stampa": Stampa lo stato del piano
-// func (p *Piano) Stampa() {
-// 	fmt.Println("Automi:")
+func (p *Piano) Stampa(x, y int) {
+	fmt.Println("Stampa elenco automi:")
+	for _, automa := range p.Automi {
+		automa.Stampa()
+	}
+	for _, ostacolo := range p.Ostacoli {
+		ostacolo.Stampa()
+	}
+}
+
+func (p *Piano) ListaAutomi() []*Automa {
+	automi := make([]*Automa, 0, len(p.Automi))
+	for _, automa := range p.Automi {
+		automi = append(automi, automa)
+	}
+	return automi
+}
+
+// func (p *Piano) Richiamo(sorgente [2]int, segnale string) {
+// 	// Mappa per tracciare gli automi che rispondono e la distanza minima
+// 	automiRispondenti := make(map[string]int)
+// 	distanzaMinima := -1
+
+// 	fmt.Printf("Richiamo emesso dalla sorgente: %v con segnale: %s\n", sorgente, segnale)
+
+// 	// Primo passaggio: trova la distanza minima tra gli automi che rispondono
 // 	for nome, automa := range p.Automi {
-// 		fmt.Printf("%s: (%d, %d)\n", nome, automa.Posizione[0], automa.Posizione[1])
+// 			// Controlla se l'automa risponde al segnale
+// 			if !strings.HasPrefix(automa.Nome, segnale) {
+// 					fmt.Printf("Automa '%s' non risponde al segnale.\n", nome)
+// 					continue
+// 			}
+
+// 			// Calcola la distanza Manhattan
+// 			distanza := GetDistanzaManhattan(automa.Posizione, sorgente)
+// 			fmt.Printf("Automa '%s' ha distanza %d dalla sorgente.\n", nome, distanza)
+
+// 			// Verifica se esiste un percorso libero
+// 			if !p.EsistePercorso(automa.Posizione, sorgente) {
+// 					fmt.Printf("Automa '%s' non può raggiungere la sorgente: %v\n", nome, sorgente)
+// 					continue
+// 			}
+
+// 			// Aggiorna la distanza minima e registra l'automa
+// 			if distanzaMinima == -1 || distanza < distanzaMinima {
+// 					distanzaMinima = distanza
+// 					automiRispondenti = map[string]int{nome: distanza}
+// 					fmt.Printf("Nuova distanza minima trovata: %d per automa '%s'.\n", distanza, nome)
+// 			} else if distanza == distanzaMinima {
+// 					automiRispondenti[nome] = distanza
+// 					fmt.Printf("Automa '%s' aggiunto con distanza minima %d.\n", nome, distanza)
+// 			}
 // 	}
 
-// 	fmt.Println("Ostacoli:")
-// 	for _, rettangolo := range p.Ostacoli {
-// 		fmt.Printf("(%d, %d) -> (%d, %d)\n",
-// 			rettangolo.AngoloBassoSinistro[0], rettangolo.AngoloBassoSinistro[1],
-// 			rettangolo.AngoloAltoDestro[0], rettangolo.AngoloAltoDestro[1])
+// 	fmt.Printf("Distanza minima: %d. Automi rispondenti: %v\n", distanzaMinima, automiRispondenti)
+
+// 	// Secondo passaggio: sposta gli automi con distanza minima
+// 	for nome := range automiRispondenti {
+// 			if automiRispondenti[nome] == distanzaMinima {
+// 					// Sposta l'automa
+// 					err := p.MuoviAutoma(nome, sorgente)
+// 					if err != nil {
+// 							fmt.Printf("Errore nel movimento dell'automa '%s': %v\n", nome, err)
+// 					} else {
+// 							fmt.Printf("Automa '%s' si è spostato a %v\n", nome, sorgente)
+// 							break // Solo un automa si deve spostare
+// 					}
+// 			}
 // 	}
 // }
-
-func (p *Piano) Stampa() {
-	minX, maxX, minY, maxY := 0, 0, 0, 0
-	for pos := range p.Mappa {
-			if pos[0] < minX {
-					minX = pos[0]
-			}
-			if pos[0] > maxX {
-					maxX = pos[0]
-			}
-			if pos[1] < minY {
-					minY = pos[1]
-			}
-			if pos[1] > maxY {
-					maxY = pos[1]
-			}
-	}
-
-	for y := maxY; y >= minY; y-- {
-			fmt.Printf("%2d  ", y)
-			for x := minX; x <= maxX; x++ {
-					key := [2]int{x, y}
-					if entita, ok := p.Mappa[key]; ok {
-							switch entita.(type) {
-							case *Automa:
-									fmt.Print("A  ")
-							case *Rettangolo:
-									fmt.Print("O  ")
-							}
-					} else {
-							fmt.Print(".  ")
-					}
-			}
-			fmt.Println()
-	}
-
-	fmt.Print("   ")
-	for x := minX; x <= maxX; x++ {
-			fmt.Printf("%2d", x)
-			if x < maxX {
-					fmt.Print(" ")
-			}
-	}
-	fmt.Println()
-}
-

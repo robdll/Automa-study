@@ -1,56 +1,47 @@
 package entita
 
-// EsistePercorso verifica se esiste un percorso libero tra due punti
-func (p *Piano) EsistePercorso(start, end [2]int) bool {
-	// Se la posizione iniziale o finale è occupata da un ostacolo, ritorna false
-	if _, ok := p.Mappa[start].(*Rettangolo); ok {
-		return false
+// func (p *Piano) EsistePercorso(start, end [2]int) bool {
+// 	fmt.Printf("Verifica percorso libero per automa da %v a %v\n", start, end)
+
+// 	// Determine the direction of movement
+// 	xStep := 1
+// 	if start[0] > end[0] {
+// 			xStep = -1
+// 	}
+// 	yStep := 1
+// 	if start[1] > end[1] {
+// 			yStep = -1
+// 	}
+
+// 	// Traverse horizontally
+// 	for x := start[0]; x != end[0]; x += xStep {
+// 			if _, ok := p.Mappa[[2]int{x, start[1]}].(*Ostacolo); ok {
+// 					fmt.Printf("Ostacolo trovato in posizione (%d, %d), percorso bloccato.\n", x, start[1])
+// 					return false
+// 			}
+// 	}
+
+// 	// Traverse vertically
+// 	for y := start[1]; y != end[1]; y += yStep {
+// 			if _, ok := p.Mappa[[2]int{end[0], y}].(*Ostacolo); ok {
+// 					fmt.Printf("Ostacolo trovato in posizione (%d, %d), percorso bloccato.\n", end[0], y)
+// 					return false
+// 			}
+// 	}
+
+// 	fmt.Printf("Percorso trovato per automa da %v a %v\n", start, end)
+// 	return true
+// }
+
+// GetDistanzaManhattan calcola la distanza Manhattan tra due punti
+func GetDistanzaManhattan(a, b [2]int) int {
+	return Abs(a[0]-b[0]) + Abs(a[1]-b[1])
+}
+
+// abs calcola il valore assoluto di un numero intero
+func Abs(x int) int {
+	if x < 0 {
+		return -x
 	}
-	if _, ok := p.Mappa[end].(*Rettangolo); ok {
-		return false
-	}
-
-	// Direzioni per i movimenti (sinistra, destra, su, giù)
-	directions := [][2]int{
-		{-1, 0}, {1, 0}, {0, -1}, {0, 1},
-	}
-
-	// Mappa per tenere traccia delle posizioni visitate
-	visited := make(map[[2]int]bool)
-	visited[start] = true
-
-	// Coda per BFS
-	queue := [][2]int{start}
-
-	// BFS loop
-	for len(queue) > 0 {
-		// Estrae il primo elemento dalla coda
-		current := queue[0]
-		queue = queue[1:]
-
-		// Controlla se siamo arrivati alla fine
-		if current == end {
-			return true
-		}
-
-		// Esplora le posizioni vicine
-		for _, dir := range directions {
-			next := [2]int{current[0] + dir[0], current[1] + dir[1]}
-
-			// Salta le posizioni già visitate o occupate da ostacoli
-			if visited[next] {
-				continue
-			}
-			if _, ok := p.Mappa[next].(*Rettangolo); ok {
-				continue
-			}
-
-			// Marca la posizione come visitata e aggiungila alla coda
-			visited[next] = true
-			queue = append(queue, next)
-		}
-	}
-
-	// Nessun percorso trovato
-	return false
+	return x
 }

@@ -6,35 +6,17 @@ import (
 )
 
 // Test per la creazione di un nuovo piano
-func TestNuovoPiano(t *testing.T) {
-	p := NuovoPiano()
-	if len(p.Automi) != 0 || len(p.Ostacoli) != 0 || len(p.Mappa) != 0 {
-		t.Errorf("NuovoPiano non crea un piano vuoto.")
-	}
-}
-
-// Test per l'operazione "Crea"
 func TestCrea(t *testing.T) {
-	p := NuovoPiano()
-
-	// Aggiungiamo dati al piano per testare il reset
-	p.Automi["test"] = &Automa{Nome: "test", Posizione: [2]int{1, 1}}
-	p.Mappa[[2]int{1, 1}] = p.Automi["test"]
-	p.Ostacoli = append(p.Ostacoli, Rettangolo{
-		AngoloBassoSinistro: [2]int{0, 0},
-		AngoloAltoDestro:    [2]int{2, 2},
-	})
-
-	// Resetta il piano
-	p.Crea()
+	p := Crea()
 	if len(p.Automi) != 0 || len(p.Ostacoli) != 0 || len(p.Mappa) != 0 {
-		t.Errorf("Crea non resetta il piano correttamente.")
+		t.Errorf("Crea non crea un piano vuoto.")
 	}
 }
+
 
 // Test per l'operazione "Stato"
 func TestStato(t *testing.T) {
-	p := NuovoPiano()
+	p := Crea()
 
 	// Aggiungiamo un automa e un ostacolo
 	p.Automi["test"] = &Automa{Nome: "test", Posizione: [2]int{1, 1}}
@@ -64,7 +46,7 @@ func TestStato(t *testing.T) {
 
 // Test per l'operazione "Stampa"
 func TestStampa(t *testing.T) {
-	p := NuovoPiano()
+	p := Crea()
 
 	// Aggiungiamo un automa
 	p.Automi["test"] = &Automa{Nome: "test", Posizione: [2]int{1, 1}}

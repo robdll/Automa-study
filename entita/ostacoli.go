@@ -2,76 +2,58 @@ package entita
 
 import "fmt"
 
-type Rettangolo struct {
+type Ostacolo struct {
 	AngoloBassoSinistro [2]int // Coordinate (x0, y0)
 	AngoloAltoDestro    [2]int // Coordinate (x1, y1)
 }
 
-func (p *Piano) AggiungiOstacolo(ostacolo Rettangolo) error {
-	fmt.Printf("Tentativo di aggiungere ostacolo: (%d, %d) -> (%d, %d)\n",
-			ostacolo.AngoloBassoSinistro[0], ostacolo.AngoloBassoSinistro[1],
-			ostacolo.AngoloAltoDestro[0], ostacolo.AngoloAltoDestro[1])
+func (r *Ostacolo) Stampa() {
+	fmt.Printf(
+		"(%d, %d)(%d, %d)\n",
+		r.AngoloBassoSinistro[0],
+		r.AngoloBassoSinistro[1],
+		r.AngoloAltoDestro[0],
+		r.AngoloAltoDestro[1],
+	)
+}
 
-	// Controlla se esiste un automa nella posizione del rettangolo
-	for x := ostacolo.AngoloBassoSinistro[0]; x <= ostacolo.AngoloAltoDestro[0]; x++ {
-			for y := ostacolo.AngoloBassoSinistro[1]; y <= ostacolo.AngoloAltoDestro[1]; y++ {
-					key := [2]int{x, y}
-					if entita, ok := p.Mappa[key]; ok {
-							switch entita.(type) {
-							case *Automa:
-									fmt.Printf("Errore: automa presente alla posizione (%d, %d), impossibile aggiungere l'ostacolo\n", x, y)
-									return fmt.Errorf("impossibile aggiungere ostacolo: esiste un automa in (%d, %d)", x, y)
-							case *Rettangolo:
-									fmt.Printf("Nota: la posizione (%d, %d) è già parte di un altro ostacolo\n", x, y)
-							}
-					}
+
+func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
+	fmt.Printf(
+		"Aggiunta ostacolo: (%d, %d) -> (%d, %d)\n", x0, y0, x1, y1,
+	)
+
+	// Controlla che non ci siano automi nell'area del rettangolo
+	for x := x0; x <= x1; x++ {
+		for y := y0; y <= y1; y++ {
+			key := [2]int{x, y}
+			if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+				if _, ok := entities[0].(*Automa); ok {
+					fmt.Println("Automa presente nell'area del rettangolo.")
+					return
+				}
 			}
+		}
 	}
 
-	// Aggiunge l'ostacolo alla lista
-	p.Ostacoli = append(p.Ostacoli, ostacolo)
-	fmt.Printf("Ostacolo aggiunto alla lista: (%d, %d) -> (%d, %d)\n",
-			ostacolo.AngoloBassoSinistro[0], ostacolo.AngoloBassoSinistro[1],
-			ostacolo.AngoloAltoDestro[0], ostacolo.AngoloAltoDestro[1])
-
-	// Popola tutti i punti del rettangolo nella mappa
-	for x := ostacolo.AngoloBassoSinistro[0]; x <= ostacolo.AngoloAltoDestro[0]; x++ {
-			for y := ostacolo.AngoloBassoSinistro[1]; y <= ostacolo.AngoloAltoDestro[1]; y++ {
-					key := [2]int{x, y}
-					p.Mappa[key] = &ostacolo
-					fmt.Printf("Aggiunto ostacolo in posizione (%d, %d)\n", x, y)
-			}
+	// Crea un nuovo ostacolo
+	newOstacolo := Ostacolo{
+		AngoloBassoSinistro: [2]int{x0, y0},
+		AngoloAltoDestro:    [2]int{x1, y1},
 	}
 
+	// Aggiungi l'ostacolo alla lista degli ostacoli
+	p.Ostacoli = append(p.Ostacoli, newOstacolo)
+
+	// Aggiorna la mappa del piano
+	for x := x0; x <= x1; x++ {
+		for y := y0; y <= y1; y++ {
+			key := [2]int{x, y}
+			if _, exists := p.Mappa[key]; !exists {
+				p.Mappa[key] = []interface{}{}
+			}
+			p.Mappa[key] = append(p.Mappa[key], &newOstacolo)
+		}
+	}
 	fmt.Println("Ostacolo aggiunto correttamente.")
-	return nil
 }
-
-func (p *Piano) RimuoviOstacolo(ostacolo Rettangolo) error {
-	// Find the obstacle in the list
-	index := -1
-	for i, o := range p.Ostacoli {
-		if o == ostacolo {
-			index = i
-			break
-		}
-	}
-
-	if index == -1 {
-		return fmt.Errorf("Ostacolo non trovato")
-	}
-
-	// Rimuove l'ostacolo dalla lista
-	p.Ostacoli = append(p.Ostacoli[:index], p.Ostacoli[index+1:]...)
-
-	// Clear the obstacle's area from the map
-	for x := ostacolo.AngoloBassoSinistro[0]; x <= ostacolo.AngoloAltoDestro[0]; x++ {
-		for y := ostacolo.AngoloBassoSinistro[1]; y <= ostacolo.AngoloAltoDestro[1]; y++ {
-			if _, ok := p.Mappa[[2]int{x, y}].(*Rettangolo); ok {
-				delete(p.Mappa, [2]int{x, y})
-			}
-		}
-	}
-	return nil
-}
-

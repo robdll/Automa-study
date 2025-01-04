@@ -6,7 +6,7 @@ import (
 )
 
 func TestAggiungiOstacolo(t *testing.T) {
-	p := NuovoPiano()
+	p := Crea()
 
 	// Aggiunge un Automa
 	p.AggiungiAutoma(1, 1, "automa1")
@@ -31,7 +31,7 @@ func TestAggiungiOstacolo(t *testing.T) {
 }
 
 func TestRimuoviOstacolo(t *testing.T) {
-	p := NuovoPiano()
+	p := Crea()
 
 	// Aggiunge un ostacolo
 	ostacolo := Rettangolo{
@@ -58,7 +58,7 @@ func TestRimuoviOstacolo(t *testing.T) {
 
 
 func TestOstacoliSovrapposti(t *testing.T) {
-	p := NuovoPiano()
+	p := Crea()
 
 	// Aggiungi un primo ostacolo
 	err := p.AggiungiOstacolo(Rettangolo{

@@ -6,7 +6,7 @@ import (
 )
 
 func TestEsistePercorso(t *testing.T) {
-	p := NuovoPiano()
+	p := Crea()
 
 	// Aggiungi un ostacolo
 	p.AggiungiOstacolo(Rettangolo{

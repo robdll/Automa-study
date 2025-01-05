@@ -13,7 +13,7 @@ type Piano struct {
 }
 
 func Crea() *Piano {
-	fmt.Println("Nuovo piano creato.")
+	fmt.Println("Piano creato.")
 	return &Piano{
 		Automi:   make(map[string]*Automa),
 		Ostacoli: []Ostacolo{},
@@ -37,13 +37,25 @@ func (p *Piano) Stato(x, y int) {
 }
 
 func (p *Piano) Stampa() {
-	fmt.Println("Automi:")
+	if len(p.Automi) > 0 {
+		fmt.Println("Automi:")
+	}
 	for _, automa := range p.Automi {
 		automa.Stampa()
 	}
-	fmt.Println("Ostacoli:")
+	if len(p.Ostacoli) > 0 {
+		fmt.Println("Ostacoli:")
+	}
 	for _, ostacolo := range p.Ostacoli {
 		ostacolo.Stampa()
+	}
+}
+
+func (p *Piano) StampaAutomiWithPrefix(prefix string) {
+	for _, automa := range p.Automi {
+		if strings.HasPrefix(automa.Nome, prefix) {
+			automa.Stampa()
+		}
 	}
 }
 
@@ -131,7 +143,6 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 
 		// Se l'automa non ha come prefisso il nome del segnale non far nulla 
 		if !strings.HasPrefix(automa.Nome, nome) {
-			fmt.Printf("Automa \"%s\" non sente il segnale\n", automa.Nome)
 			continue
 		}
 
@@ -157,11 +168,8 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 	// Considera gli automi con distanza in analisi, partendo dalla minima
 	for i := 0; i < len(distances) && !automaMoved; i++ {
 		automaGroup := automasByDistance[distances[i]]
-		fmt.Println("Analisi per distanza:", automaGroup.Distanza)
 		for _, automa := range automaGroup.Automi {
-			fmt.Printf("Controllo per Automa \"%s\"\n", automa.Nome)
 			if p.EsistePercorso(automa.Posizione, key) {
-				fmt.Println("Sposto Automa")
 
 				// Rimuovi l'automa dalla mappa precedente
 				oldPos := automa.Posizione
@@ -172,6 +180,7 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 						break
 					}
         }
+
         // Se la slice risultante è vuota, rimuovi completamente la chiave
         if len(p.Mappa[oldPos]) == 0 {
 					delete(p.Mappa, oldPos)
@@ -187,9 +196,9 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 					p.Mappa[key] = []interface{}{automa}
 				}
 
+				fmt.Printf("Automa %s spostato\n", automa.Nome)
+
 				automaMoved = true
-			} else {
-				fmt.Println("Nessun Percorso")
 			}
 		}
 	}
@@ -202,4 +211,75 @@ func (p *Piano) isOstacolo(key [2]int) bool {
 		}
 	}
 	return false
+}
+
+func (p *Piano) EsistePercorso(pointA, pointB [2]int) bool {
+
+	start := pointA
+	end := pointB
+	
+	// Scambia punti se B è sotto A
+	if pointB[1] < pointA[1] {
+		start, end = pointB, pointA
+	}
+
+	queue := [][2]int{start}
+	visited := make(map[[2]int]bool)
+	visited[start] = true
+
+	// Direzioni possibili: Alto, e Destra o Sinistra
+	directions := [][2]int{
+		{0, 1}, // Alto
+	}
+	if start[0] < end[0] {
+		directions = append(directions, [2]int{1, 0}) // Destra
+	} else {
+		directions = append(directions, [2]int{-1, 0}) // Sinistra
+	}
+
+	for len(queue) > 0 {
+		// Prendi il primo elemento della coda
+		current := queue[0]
+		// Rimuovi il primo elemento dalla coda
+		queue = queue[1:]
+
+		// Termina se raggiungi il punto finale 
+		if current == end {
+			return true
+		}
+
+		// Esplora i vicini
+		for _, dir := range directions {
+			neighbor := [2]int{current[0] + dir[0], current[1] + dir[1]}
+
+			outsideHorizontalLimit := false
+			if  start[0] < end[0] && neighbor[0] > end[0] {
+				outsideHorizontalLimit = true
+			}
+			if  start[0] > end[0] && neighbor[0] < end[0] {
+				outsideHorizontalLimit = true
+			}
+			
+			/* Salta nei seguente casi:
+			* 1) è già stato visitato,
+			* 2) è un ostacolo,
+			* 3) il vicino è fuori dai limiti del movimento. */
+			if visited[neighbor] || p.isOstacolo(neighbor) || (outsideHorizontalLimit || neighbor[1] > end[1])  {
+				continue
+			}
+
+			// Marca il vicino come visitato e aggiungilo alla coda
+			visited[neighbor] = true
+			queue = append(queue, neighbor)
+		}
+	}
+	return false
+}
+
+func (p *Piano) OttieniAutoma(name string) (*Automa, error) {
+	automa, exists := p.Automi[name]
+	if !exists {
+		return nil, fmt.Errorf("Automa '%s' non trovato", name)
+	}
+	return automa, nil
 }

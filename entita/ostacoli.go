@@ -19,17 +19,13 @@ func (r *Ostacolo) Stampa() {
 
 
 func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
-	fmt.Printf(
-		"Aggiunta ostacolo: (%d, %d) -> (%d, %d)\n", x0, y0, x1, y1,
-	)
-
 	// Controlla che non ci siano automi nell'area del rettangolo
 	for x := x0; x <= x1; x++ {
 		for y := y0; y <= y1; y++ {
 			key := [2]int{x, y}
 			if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
 				if _, ok := entities[0].(*Automa); ok {
-					fmt.Println("Automa presente nell'area del rettangolo.")
+					fmt.Println("Impossibile posizionare ostacolo in quella posizione.")
 					return
 				}
 			}
@@ -55,5 +51,7 @@ func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
 			p.Mappa[key] = append(p.Mappa[key], &newOstacolo)
 		}
 	}
-	fmt.Println("Ostacolo aggiunto correttamente.")
+	fmt.Printf(
+		"Ostacolo creato: (%d, %d) -> (%d, %d)\n", x0, y0, x1, y1,
+	)
 }

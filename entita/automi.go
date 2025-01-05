@@ -38,16 +38,18 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 			}
 		}
 
-		// Crea un nuovo automa dopo aver inizializzato p.Mappa[key] se necessario
-		if _, exists := p.Mappa[key]; !exists {
-			p.Mappa[key] = []interface{}{}
-		}
-		newAutoma := &Automa{
-			Nome:	nome,
-			Posizione: key,
-		}
-		p.Automi[nome] = newAutoma
-		p.Mappa[key] = append(p.Mappa[key], newAutoma)
-		fmt.Println("Creazione effettuata.")
 	}
+
+	// Crea un nuovo automa dopo aver inizializzato p.Mappa[key] se necessario
+	if _, exists := p.Mappa[key]; !exists {
+		p.Mappa[key] = []interface{}{}
+	}
+	newAutoma := &Automa{
+		Nome:	nome,
+		Posizione: key,
+	}
+	p.Automi[nome] = newAutoma
+	p.Mappa[key] = append(p.Mappa[key], newAutoma)
+	fmt.Println("Creazione effettuata.")
+
 }

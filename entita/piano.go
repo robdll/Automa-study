@@ -13,12 +13,16 @@ type Piano struct {
 }
 
 func Crea() *Piano {
-	fmt.Println("Piano creato.")
+	ConditionalOutput("Piano creato.")
 	return &Piano{
 		Automi:   make(map[string]*Automa),
 		Ostacoli: []Ostacolo{},
 		Mappa:    make(map[[2]int][]interface{}),
 	}
+}
+
+func NewPiano() *Piano {
+	return Crea()
 }
 
 func (p *Piano) Stato(x, y int) {
@@ -38,17 +42,21 @@ func (p *Piano) Stato(x, y int) {
 
 func (p *Piano) Stampa() {
 	if len(p.Automi) > 0 {
-		fmt.Println("Automi:")
+		ConditionalOutput("Automi:")
 	}
+	fmt.Println('(')
 	for _, automa := range p.Automi {
 		automa.Stampa()
 	}
+	fmt.Println(')')
 	if len(p.Ostacoli) > 0 {
-		fmt.Println("Ostacoli:")
+		ConditionalOutput("Ostacoli:")
 	}
+	fmt.Println('[')
 	for _, ostacolo := range p.Ostacoli {
 		ostacolo.Stampa()
 	}
+	fmt.Println(']')
 }
 
 func (p *Piano) StampaAutomiWithPrefix(prefix string) {

@@ -18,7 +18,7 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 
 	// Controlla l'esistenza di un Ostacolo nella posizione (x, y)
 	if p.isOstacolo(key) {
-		fmt.Println("Impossibile posizionare automa in quella posizione.")
+		ConditionalOutput("Impossibile posizionare automa in quella posizione.")
 		return
 	}
 

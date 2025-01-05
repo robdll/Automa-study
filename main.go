@@ -2,17 +2,22 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"flag"
 	"os"
 	. "progetto-algoritmi/entita"
 	"strings"
 )
 
 func main() {
+
+	silent := flag.Bool("silent", false, "Suppress most standard output")
+	flag.Parse()
+	Silent = *silent
+
 	p := Crea()
 	scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println("## Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")
+	ConditionalOutput("## Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(strings.TrimSpace(line)) == 0 {
@@ -20,16 +25,16 @@ func main() {
 		}
 
 		if line == "f" {
-			fmt.Println("Esecuzione Terminata.")
+			ConditionalOutput("Esecuzione Terminata.")
 			break
 		}
 
 		err := Esegui(p, line)
 		if err != nil {
-			fmt.Println(" ", err)
+			ConditionalOutput(" ", err)
 		}
 
-		fmt.Println("## Attesa comando")
+		ConditionalOutput("## Attesa comando")
 	}
 
 }

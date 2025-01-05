@@ -13,7 +13,7 @@ type Piano struct {
 }
 
 func Crea() *Piano {
-	fmt.Println("Creazione di un nuovo piano.")
+	fmt.Println("Nuovo piano creato.")
 	return &Piano{
 		Automi:   make(map[string]*Automa),
 		Ostacoli: []Ostacolo{},
@@ -36,11 +36,12 @@ func (p *Piano) Stato(x, y int) {
 	}
 }
 
-func (p *Piano) Stampa(x, y int) {
-	fmt.Println("Stampa elenco automi:")
+func (p *Piano) Stampa() {
+	fmt.Println("Automi:")
 	for _, automa := range p.Automi {
 		automa.Stampa()
 	}
+	fmt.Println("Ostacoli:")
 	for _, ostacolo := range p.Ostacoli {
 		ostacolo.Stampa()
 	}

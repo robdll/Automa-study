@@ -21,19 +21,24 @@ func NewPiano() *Piano {
 	}
 }
 
-func (p *Piano) Stato(x, y int) {
-	ConditionalOutput("Stato del piano in posizione: (",x,",",y, ")")
+func (p *Piano) Stato(x, y int, shouldPrint bool) string{
 	key := [2]int{x, y}
+	var toPrint string
 	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
 		switch entities[0].(type) {
 		case *Automa:
-			fmt.Println("A")
+			toPrint = "A"
 		case *Ostacolo:
-			fmt.Println("O")
+			toPrint = "O"
 		}
 	} else {
-		fmt.Println("E")
+		toPrint = "E"
 	}
+	if shouldPrint {
+		ConditionalOutput("Stato del piano in posizione: (",x,",",y, ")", shouldPrint)
+		fmt.Println(toPrint)
+	}
+	return toPrint
 }
 
 func (p *Piano) Stampa() {
@@ -115,15 +120,6 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 			}
 		}
 	}
-}
-
-func (p *Piano) isOstacolo(key [2]int) bool {
-	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
-		if _, ok := entities[0].(*Ostacolo); ok {
-			return true
-		}
-	}
-	return false
 }
 
 func (p *Piano) EsistePercorso(pointA, pointB [2]int) bool {

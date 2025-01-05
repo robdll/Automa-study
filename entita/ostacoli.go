@@ -22,12 +22,9 @@ func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
 	// Controlla che non ci siano automi nell'area del rettangolo
 	for x := x0; x <= x1; x++ {
 		for y := y0; y <= y1; y++ {
-			key := [2]int{x, y}
-			if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
-				if _, ok := entities[0].(*Automa); ok {
-					ConditionalOutput("Impossibile posizionare ostacolo in quella posizione.")
-					return
-				}
+			if p.isAutoma([2]int{x, y}) {
+				ConditionalOutput("Impossibile posizionare ostacolo in quella posizione.")
+				return
 			}
 		}
 	}

@@ -17,7 +17,7 @@ func main() {
 	p := Crea()
 	scanner := bufio.NewScanner(os.Stdin)
 
-	// ConditionalOutput("## Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")
+	ConditionalOutput("## Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(strings.TrimSpace(line)) == 0 {
@@ -25,16 +25,16 @@ func main() {
 		}
 
 		if line == "f" {
-			// ConditionalOutput("Esecuzione Terminata.")
+			ConditionalOutput("Esecuzione Terminata.")
 			break
 		}
 
 		err := Esegui(p, line)
 		if err != nil {
-			// ConditionalOutput(" ", err)
+			ConditionalOutput(" ", err)
 		}
 
-		// ConditionalOutput("## Attesa comando")
+		ConditionalOutput("## Attesa comando")
 	}
 
 }

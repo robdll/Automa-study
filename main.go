@@ -24,4 +24,10 @@ func main() {
 
 	p.StampaGrafica()
 
+	p.Richiamo(3, 1, "1")
+
+	p.Richiamo(5, 3, "1")
+
+	p.StampaGrafica()
+
 }

@@ -2,6 +2,8 @@ package entita
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 )
 
 type Piano struct {
@@ -107,55 +109,96 @@ func (p *Piano) StampaGrafica() {
 	fmt.Println()
 }
 
-// func (p *Piano) Richiamo(sorgente [2]int, segnale string) {
-// // Mappa per tracciare gli automi che rispondono e la distanza minima
-// automiRispondenti := make(map[string]int)
-// distanzaMinima := -1
 
-// fmt.Printf("Richiamo emesso dalla sorgente: %v con segnale: %s\n", sorgente, segnale)
+func (p *Piano) Richiamo(x, y int, nome string) {
+	fmt.Printf("Richiamo %s in posizione (%d, %d)\n", nome, x, y)
 
-// // Primo passaggio: trova la distanza minima tra gli automi che rispondono
-// for nome, automa := range p.Automi {
-// 		// Controlla se l'automa risponde al segnale
-// 		if !strings.HasPrefix(automa.Nome, segnale) {
-// 				fmt.Printf("Automa '%s' non risponde al segnale.\n", nome)
-// 				continue
-// 		}
+	// Chiave della posizione del richiamo
+	key := [2]int{x, y}
 
-// 		// Calcola la distanza Manhattan
-// 		distanza := GetDistanzaManhattan(automa.Posizione, sorgente)
-// 		fmt.Printf("Automa '%s' ha distanza %d dalla sorgente.\n", nome, distanza)
+	// Se è presente un ostacolo o un automa non fare nulla
+	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+		fmt.Printf("Richiamo \"%s\" ignorato, posizione occupata\n", nome)
+		return
+	}
 
-// 		// Verifica se esiste un percorso libero
-// 		if !p.EsistePercorso(automa.Posizione, sorgente) {
-// 				fmt.Printf("Automa '%s' non può raggiungere la sorgente: %v\n", nome, sorgente)
-// 				continue
-// 		}
+	automasByDistance := make(map[int]*AutomaGroup)
+	distances := []int{}
 
-// 		// Aggiorna la distanza minima e registra l'automa
-// 		if distanzaMinima == -1 || distanza < distanzaMinima {
-// 				distanzaMinima = distanza
-// 				automiRispondenti = map[string]int{nome: distanza}
-// 				fmt.Printf("Nuova distanza minima trovata: %d per automa '%s'.\n", distanza, nome)
-// 		} else if distanza == distanzaMinima {
-// 				automiRispondenti[nome] = distanza
-// 				fmt.Printf("Automa '%s' aggiunto con distanza minima %d.\n", nome, distanza)
-// 		}
-// }
+	// Considera tutti gli automi del piano
+	for _, automa := range p.Automi {
 
-// fmt.Printf("Distanza minima: %d. Automi rispondenti: %v\n", distanzaMinima, automiRispondenti)
+		// Se l'automa non ha come prefisso il nome del segnale non far nulla 
+		if !strings.HasPrefix(automa.Nome, nome) {
+			fmt.Printf("Automa \"%s\" non sente il segnale\n", automa.Nome)
+			continue
+		}
 
-// // Secondo passaggio: sposta gli automi con distanza minima
-// for nome := range automiRispondenti {
-// 		if automiRispondenti[nome] == distanzaMinima {
-// 				// Sposta l'automa
-// 				err := p.MuoviAutoma(nome, sorgente)
-// 				if err != nil {
-// 						fmt.Printf("Errore nel movimento dell'automa '%s': %v\n", nome, err)
-// 				} else {
-// 						fmt.Printf("Automa '%s' si è spostato a %v\n", nome, sorgente)
-// 						break // Solo un automa si deve spostare
-// 				}
-// 		}
-// }
-// }
+		// Calcola la distanza Manhattan
+		distance := GetManhattanDistance(automa.Posizione, key)
+		
+		// Check if the distance group exists
+		if _, exists := automasByDistance[distance]; !exists {
+			automasByDistance[distance] = &AutomaGroup{
+				Distanza: distance,
+				Automi:   []*Automa{},
+			}
+			distances = append(distances, distance)
+		}
+		automasByDistance[distance].Automi = append(automasByDistance[distance].Automi, automa)
+		
+	}
+	
+	// Ordina le distanze in ordine crescente O(nlogn)
+	sort.Ints(distances)
+
+	automaMoved := false
+	// Considera gli automi con distanza in analisi, partendo dalla minima
+	for i := 0; i < len(distances) && !automaMoved; i++ {
+		automaGroup := automasByDistance[distances[i]]
+		fmt.Println("Analisi per distanza:", automaGroup.Distanza)
+		for _, automa := range automaGroup.Automi {
+			fmt.Printf("Controllo per Automa \"%s\"\n", automa.Nome)
+			if p.EsistePercorso(automa.Posizione, key) {
+				fmt.Println("Sposto Automa")
+
+				// Rimuovi l'automa dalla mappa precedente
+				oldPos := automa.Posizione
+    		entities := p.Mappa[oldPos]
+        for idx, entity := range entities {
+					if entity == automa {
+						p.Mappa[oldPos] = append(entities[:idx], entities[idx+1:]...)
+						break
+					}
+        }
+        // Se la slice risultante è vuota, rimuovi completamente la chiave
+        if len(p.Mappa[oldPos]) == 0 {
+					delete(p.Mappa, oldPos)
+        }
+
+				// Sposta l'automa alla nuova posizione
+				automa.Posizione = key
+
+				// Aggiungi l'automa alla mappa
+				if _, exists := p.Mappa[key]; exists {
+					p.Mappa[key] = append(p.Mappa[key], automa)
+				} else {
+					p.Mappa[key] = []interface{}{automa}
+				}
+
+				automaMoved = true
+			} else {
+				fmt.Println("Nessun Percorso")
+			}
+		}
+	}
+}
+
+func (p *Piano) isOstacolo(key [2]int) bool {
+	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+		if _, ok := entities[0].(*Ostacolo); ok {
+			return true
+		}
+	}
+	return false
+}

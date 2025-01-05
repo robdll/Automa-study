@@ -26,7 +26,7 @@ func NewPiano() *Piano {
 }
 
 func (p *Piano) Stato(x, y int) {
-	fmt.Printf("Stato del piano in posizione: (%d, %d)\n", x, y)
+	ConditionalOutput("Stato del piano in posizione: (",x,",",y, ")")
 	key := [2]int{x, y}
 	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
 		switch entities[0].(type) {
@@ -44,38 +44,40 @@ func (p *Piano) Stampa() {
 	if len(p.Automi) > 0 {
 		ConditionalOutput("Automi:")
 	}
-	fmt.Println('(')
+	fmt.Println("(")
 	for _, automa := range p.Automi {
 		automa.Stampa()
 	}
-	fmt.Println(')')
+	fmt.Println(")")
 	if len(p.Ostacoli) > 0 {
 		ConditionalOutput("Ostacoli:")
 	}
-	fmt.Println('[')
+	fmt.Println("[")
 	for _, ostacolo := range p.Ostacoli {
 		ostacolo.Stampa()
 	}
-	fmt.Println(']')
+	fmt.Println("]")
 }
 
 func (p *Piano) StampaAutomiWithPrefix(prefix string) {
+	fmt.Println("(")
 	for _, automa := range p.Automi {
 		if strings.HasPrefix(automa.Nome, prefix) {
 			automa.Stampa()
 		}
 	}
+	fmt.Println(")")
 }
 
 func (p *Piano) Richiamo(x, y int, nome string) {
-	fmt.Printf("Richiamo %s in posizione (%d, %d)\n", nome, x, y)
+	ConditionalOutput("Richiamo", nome, "in posizione (", x,",", y, ")")
 
 	// Chiave della posizione del richiamo
 	key := [2]int{x, y}
 
 	// Se è presente un ostacolo o un automa non fare nulla
 	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
-		fmt.Printf("Richiamo \"%s\" ignorato, posizione occupata\n", nome)
+		ConditionalOutput("Richiamo", nome, "ignorato, posizione occupata")
 		return
 	}
 
@@ -112,7 +114,7 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 		for _, automa := range automasGroup {
 			if p.EsistePercorso(automa.Posizione, key) {
 				p.PosizionaAutoma(x, y, automa.Nome)
-				fmt.Printf("Automa %s spostato\n", automa.Nome)
+				ConditionalOutput("Automa", automa.Nome, "spostato")
 				automaMoved = true
 			}
 		}

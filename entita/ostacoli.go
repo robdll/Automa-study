@@ -9,7 +9,7 @@ type Ostacolo struct {
 
 func (r *Ostacolo) Stampa() {
 	fmt.Printf(
-		"(%d, %d)(%d, %d)\n",
+		"(%d,%d)(%d,%d)\n",
 		r.AngoloBassoSinistro[0],
 		r.AngoloBassoSinistro[1],
 		r.AngoloAltoDestro[0],
@@ -51,7 +51,7 @@ func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
 			p.Mappa[key] = append(p.Mappa[key], &newOstacolo)
 		}
 	}
-	fmt.Printf(
-		"Ostacolo creato: (%d, %d) -> (%d, %d)\n", x0, y0, x1, y1,
+	ConditionalOutput(
+		"Ostacolo creato: (", x0, ",",y0,") -> (", x1, ",",y1,")",
 	)
 }

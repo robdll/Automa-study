@@ -7,7 +7,7 @@ import (
 )
 
 
-var Silent bool
+var Silent = true
 
 func ConditionalOutput(message ...interface{}) {
 	if !Silent {

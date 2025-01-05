@@ -10,9 +10,9 @@ import (
 
 func main() {
 
-	silent := flag.Bool("silent", false, "Suppress most standard output")
+	verbose := flag.Bool("verbose", false, "Enable verbose output")
 	flag.Parse()
-	Silent = *silent
+	Silent = !*verbose
 
 	p := Crea()
 	scanner := bufio.NewScanner(os.Stdin)

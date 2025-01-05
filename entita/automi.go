@@ -10,7 +10,7 @@ type Automa struct {
 }
 
 func (a *Automa) Stampa() {
-	fmt.Printf("%s: (%d, %d)\n", a.Nome, a.Posizione[0], a.Posizione[1])
+	fmt.Printf("%s: %d,%d\n", a.Nome, a.Posizione[0], a.Posizione[1])
 }
 
 func (p *Piano) PosizionaAutoma(x, y int, nome string) {
@@ -38,7 +38,7 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 		// Aggiungi l'Automa alla mappa e alla lista degli automi
 		p.Automi[nome] = newAutoma
 		p.Mappa[key] = append(p.Mappa[key], newAutoma)
-		fmt.Println("Automa creato.")
+		ConditionalOutput("Automa creato.")
 	} else {
 		oldKey := automaToPlace.Posizione
 		for index, target := range p.Mappa[oldKey] {
@@ -55,6 +55,6 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 		// Aggiorna la posizione dell'Automa e la mappa
 		automaToPlace.Posizione = [2]int{x, y}
 		p.Mappa[key] = append(p.Mappa[key], automaToPlace)
-		fmt.Println("Automa spostato.")
+		ConditionalOutput("Automa spostato.")
 	}
 }

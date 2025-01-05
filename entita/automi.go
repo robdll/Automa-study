@@ -17,35 +17,44 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 	key := [2]int{x, y}
 
 	// Controlla l'esistenza di un Ostacolo nella posizione (x, y)
-	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
-		// Se è un ostacolo, non fare nulla
-		if _, ok := entities[0].(*Ostacolo); ok {
-			fmt.Println("Impossibile posizionare automa in quella posizione.")
-			return
-		} 
+	if p.isOstacolo(key) {
+		fmt.Println("Impossibile posizionare automa in quella posizione.")
+		return
 	}
 
-	// Cerca tra gli automi del piano se ne esiste uno con il nome fornito
-	automi := p.ListaAutomi()
-	for i := 0; i < len(automi); i++ {
-		// Sposta l'automa se lo trovi
-		if automi[i].Nome == nome {
-			automi[i].Posizione = [2]int{x, y}
-			fmt.Println("Automa spostato.")
-			return
-		}
-	}
-
-	// Crea un nuovo automa dopo aver inizializzato p.Mappa[key] se necessario
+	// Inizializza p.Mappa[key] alla nuova posizione se necessario
 	if _, exists := p.Mappa[key]; !exists {
 		p.Mappa[key] = []interface{}{}
 	}
-	newAutoma := &Automa{
-		Nome:	nome,
-		Posizione: key,
-	}
-	p.Automi[nome] = newAutoma
-	p.Mappa[key] = append(p.Mappa[key], newAutoma)
-	fmt.Println("Automa creato.")
 
+	// Cerca tra gli automi del piano se ne esiste uno con il nome fornito
+	automaToPlace, _ := p.OttieniAutoma(nome)
+	if automaToPlace == nil {
+		// Crea un nuovo Automa
+		newAutoma := &Automa{
+			Nome:	nome,
+			Posizione: key,
+		}
+		// Aggiungi l'Automa alla mappa e alla lista degli automi
+		p.Automi[nome] = newAutoma
+		p.Mappa[key] = append(p.Mappa[key], newAutoma)
+		fmt.Println("Automa creato.")
+	} else {
+		oldKey := automaToPlace.Posizione
+		for index, target := range p.Mappa[oldKey] {
+			if target == automaToPlace {
+				// Rimuovi l'Automa dalla vecchia posizione
+				p.Mappa[oldKey] = append(p.Mappa[oldKey][:index], p.Mappa[oldKey][index+1:]...)
+				// Cancella la chiave se non ci sono più entità in quella posizione
+				if len(p.Mappa[oldKey]) == 0 {
+					delete(p.Mappa, oldKey)
+				}
+				break
+			}
+		}
+		// Aggiorna la posizione dell'Automa e la mappa
+		automaToPlace.Posizione = [2]int{x, y}
+		p.Mappa[key] = append(p.Mappa[key], automaToPlace)
+		fmt.Println("Automa spostato.")
+	}
 }

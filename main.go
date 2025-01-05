@@ -12,7 +12,7 @@ func main() {
 	p := Crea()
 	scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println("Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")
+	fmt.Println("## Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(strings.TrimSpace(line)) == 0 {
@@ -26,7 +26,7 @@ func main() {
 
 		err := Esegui(p, line)
 		if err != nil {
-			fmt.Println("Comando non valido: ", err)
+			fmt.Println(" ", err)
 		}
 
 		fmt.Println("## Attesa comando")

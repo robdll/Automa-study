@@ -28,7 +28,7 @@ func PrintHelp() {
 	fmt.Println("  s <x> <y>           		- Stampa lo stato del piano nel punto (<x>, <y>):")
 	fmt.Println("                        	'A' se presente almeno automa, 'O' per gli ostacoli obstacle, 'E' se vuoto.")
 	fmt.Println("  S                   		- Stampa tutti gli automi seguiti da tutti gli ostacoli.")
-	fmt.Println("  S                   		- Stampa grafica del piano.")
+	fmt.Println("  G                   		- Stampa grafica del piano.")
 	fmt.Println("  a <x> <y> <n>       		- Posiziona o muove un automa con nome n nel punto (<x>, <y>).")
 	fmt.Println("  o <x0> <y0> <x1> <y1>  	- Aggiunge un ostacolo con angoli (<x0>, <y0>) e (<x1>, <y1>).")
 	fmt.Println("  r <x> <y> <n>          	- Emette un segnale con nome <n> dalla posizione (<x>, <y>).")
@@ -50,12 +50,12 @@ func Esegui(piano *Piano, input string) error {
 		*piano = *Crea()
 	case "s":
 		if len(args) != 3 {
-			return fmt.Errorf("@_@^ il comando 's' deve essere seguito da due coordinate.")
+			return fmt.Errorf("@_@^ Il comando 's' deve essere seguito da due coordinate.")
 		}
 		x, err1 := strconv.Atoi(args[1])
 		y, err2 := strconv.Atoi(args[2])
 		if err1 != nil || err2 != nil {
-			return fmt.Errorf("@_@^ coordinate non valide.")
+			return fmt.Errorf("@_@^ Coordinate non valide.")
 		}
 		piano.Stato(x, y)
 	case "G":
@@ -64,7 +64,7 @@ func Esegui(piano *Piano, input string) error {
 		piano.Stampa()
 	case "a":
 		if len(args) != 4 {
-			return fmt.Errorf("@_@^ il comando 'a' deve essere seguito da due coordinate e una una stringa in formato binario.")
+			return fmt.Errorf("@_@^ Il comando 'a' deve essere seguito da due coordinate e una una stringa in formato binario.")
 		}
 		x, err1 := strconv.Atoi(args[1])
 		y, err2 := strconv.Atoi(args[2])
@@ -74,7 +74,7 @@ func Esegui(piano *Piano, input string) error {
 		piano.PosizionaAutoma(x, y, args[3])
 	case "o":
 		if len(args) != 5 {
-			return fmt.Errorf("@_@^ il comando 'o' deve essere seguito da quattro coordinate.")
+			return fmt.Errorf("@_@^ Il comando 'o' deve essere seguito da quattro coordinate.")
 		}
 		x0, _ := strconv.Atoi(args[1])
 		y0, _ := strconv.Atoi(args[2])
@@ -83,19 +83,19 @@ func Esegui(piano *Piano, input string) error {
 		piano.AggiungiOstacolo(x0, y0, x1, y1)
 	case "r":
 		if len(args) != 4 {
-			return fmt.Errorf("@_@^ il comando 'r' deve essere seguito da 2 coordinate e una una stringa in formato binario.")
+			return fmt.Errorf("@_@^ Il comando 'r' deve essere seguito da 2 coordinate e una una stringa in formato binario.")
 		}
 		x, _ := strconv.Atoi(args[1])
 		y, _ := strconv.Atoi(args[2])
 		piano.Richiamo(x, y, args[3])
 	case "p":
 		if len(args) != 2 {
-			return fmt.Errorf("@_@^ il comando 'p' deve essere seguito da una stringa in formato binario.")
+			return fmt.Errorf("@_@^ Il comando 'p' deve essere seguito da una stringa in formato binario.")
 		}
 		piano.StampaAutomiWithPrefix(args[1])
 	case "e":
 		if len(args) != 4 {
-			return fmt.Errorf("@_@^ il comando 'e' deve essere seguito da due coordinate e una stringa in formato binario.")
+			return fmt.Errorf("@_@^ Il comando 'e' deve essere seguito da due coordinate e una stringa in formato binario.")
 		}
 		x, _ := strconv.Atoi(args[1])
 		y, _ := strconv.Atoi(args[2])
@@ -112,8 +112,62 @@ func Esegui(piano *Piano, input string) error {
 	case "f":
 		return nil
 	default:
-		return fmt.Errorf("@_@^ Comando non valido")
+		return fmt.Errorf("@_@^ Comando non riconosciuto.")
+	}
+	return nil
+}
+
+// Stampa il piano graficamente sulla console
+func (p *Piano) StampaGrafica() {
+	var minX, maxX, minY, maxY int
+	undefinedValue := true
+	for pos := range p.Mappa {
+		if undefinedValue {
+			minX, maxX, minY, maxY = pos[0], pos[0], pos[1], pos[1]
+			undefinedValue = false
+			continue
+		}
+		if pos[0] < minX {
+			minX = pos[0]
+		}
+		if pos[0] > maxX {
+			maxX = pos[0]
+		}
+		if pos[1] < minY {
+			minY = pos[1]
+		}
+		if pos[1] > maxY {
+			maxY = pos[1]
+		}
 	}
 
-	return nil
+	// Stampa il piano punto per punto dall'alto verso il basso
+	for y := maxY; y >= minY; y-- {
+		fmt.Printf("%2d | ", y)
+		for x := minX; x <= maxX; x++ {
+			key := [2]int{x, y}
+			if entities, ok := p.Mappa[key]; ok {
+				switch entities[0].(type) {
+				case *Automa:
+					fmt.Print("A  ")
+				case *Ostacolo:
+					fmt.Print("O  ")
+				}
+			} else {
+				fmt.Print(".  ")
+			}
+		}
+		fmt.Println()
+	}
+
+	fmt.Print("    ")
+	for x := minX; x <= maxX; x++ {
+		fmt.Printf("---")
+	}
+	fmt.Println()
+	fmt.Print("    ")
+	for x := minX; x <= maxX; x++ {
+		fmt.Printf("%2d ", x)
+	}
+	fmt.Println()
 }

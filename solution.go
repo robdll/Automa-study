@@ -14,7 +14,7 @@ func main() {
 	flag.Parse()
 	Silent = !*verbose
 
-	p := Crea()
+	p := NewPiano()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	ConditionalOutput("## Pronto per la ricezione comandi. ('h' per la lista comandi, 'f' per terminare).")

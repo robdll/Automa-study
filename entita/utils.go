@@ -51,7 +51,7 @@ func Esegui(piano *Piano, input string) error {
 	case "h":
 		PrintHelp()
 	case "c":
-		*piano = *Crea()
+		piano = NewPiano()
 	case "s":
 		if len(args) != 3 {
 			return fmt.Errorf("@_@^ Il comando 's' deve essere seguito da due coordinate.")

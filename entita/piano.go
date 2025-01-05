@@ -12,17 +12,13 @@ type Piano struct {
 	Mappa     map[[2]int][]interface{}
 }
 
-func Crea() *Piano {
+func NewPiano() *Piano {
 	ConditionalOutput("Piano creato.")
 	return &Piano{
 		Automi:   make(map[string]*Automa),
 		Ostacoli: []Ostacolo{},
 		Mappa:    make(map[[2]int][]interface{}),
 	}
-}
-
-func NewPiano() *Piano {
-	return Crea()
 }
 
 func (p *Piano) Stato(x, y int) {

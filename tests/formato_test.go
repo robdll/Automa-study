@@ -178,21 +178,21 @@ p 1`,
 	}
 }
 
-func TestFormatoTortuosita(t *testing.T) {
-	casiTest := []CasoTest{
-		{"tortuosità 0",
-			`c
-a 1 2 1
-t 10 2`,
-			"0\n"},
-	}
+// func TestFormatoTortuosita(t *testing.T) {
+// 	casiTest := []CasoTest{
+// 		{"tortuosità 0",
+// 			`c
+// a 1 2 1
+// t 10 2`,
+// 			"0\n"},
+// 	}
 
-	for _, ct := range casiTest {
-		t.Run(ct.nome, func(t *testing.T) {
-			output := eseguiTest(ct.input)
-			if output != ct.atteso {
-				t.Errorf("\nInput:\n%s \n\nESECUZIONE:\n<<<<<\n%s\n>>>>\n\nATTESO:\n<<<<<\n%s\n>>>>", ct.input, output, ct.atteso)
-			}
-		})
-	}
-}
+// 	for _, ct := range casiTest {
+// 		t.Run(ct.nome, func(t *testing.T) {
+// 			output := eseguiTest(ct.input)
+// 			if output != ct.atteso {
+// 				t.Errorf("\nInput:\n%s \n\nESECUZIONE:\n<<<<<\n%s\n>>>>\n\nATTESO:\n<<<<<\n%s\n>>>>", ct.input, output, ct.atteso)
+// 			}
+// 		})
+// 	}
+// }

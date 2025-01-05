@@ -50,12 +50,12 @@ func Esegui(piano *Piano, input string) error {
 		*piano = *Crea()
 	case "s":
 		if len(args) != 3 {
-			return fmt.Errorf("il comando 's' deve essere seguito da due coordinate.")
+			return fmt.Errorf("@_@^ il comando 's' deve essere seguito da due coordinate.")
 		}
 		x, err1 := strconv.Atoi(args[1])
 		y, err2 := strconv.Atoi(args[2])
 		if err1 != nil || err2 != nil {
-			return fmt.Errorf("coordinate non valide.")
+			return fmt.Errorf("@_@^ coordinate non valide.")
 		}
 		piano.Stato(x, y)
 	case "G":
@@ -64,17 +64,17 @@ func Esegui(piano *Piano, input string) error {
 		piano.Stampa()
 	case "a":
 		if len(args) != 4 {
-			return fmt.Errorf("il comando 'a' deve essere seguito da due coordinate e una una stringa in formato binario.")
+			return fmt.Errorf("@_@^ il comando 'a' deve essere seguito da due coordinate e una una stringa in formato binario.")
 		}
 		x, err1 := strconv.Atoi(args[1])
 		y, err2 := strconv.Atoi(args[2])
 		if err1 != nil || err2 != nil {
-			return fmt.Errorf("coordinate non valide.")
+			return fmt.Errorf("@_@^ coordinate non valide.")
 		}
 		piano.PosizionaAutoma(x, y, args[3])
 	case "o":
 		if len(args) != 5 {
-			return fmt.Errorf("il comando 'o' deve essere seguito da quattro coordinate.")
+			return fmt.Errorf("@_@^ il comando 'o' deve essere seguito da quattro coordinate.")
 		}
 		x0, _ := strconv.Atoi(args[1])
 		y0, _ := strconv.Atoi(args[2])
@@ -83,33 +83,36 @@ func Esegui(piano *Piano, input string) error {
 		piano.AggiungiOstacolo(x0, y0, x1, y1)
 	case "r":
 		if len(args) != 4 {
-			return fmt.Errorf("il comando 'r' deve essere seguito da 2 coordinate e una una stringa in formato binario.")
+			return fmt.Errorf("@_@^ il comando 'r' deve essere seguito da 2 coordinate e una una stringa in formato binario.")
 		}
 		x, _ := strconv.Atoi(args[1])
 		y, _ := strconv.Atoi(args[2])
 		piano.Richiamo(x, y, args[3])
 	case "p":
 		if len(args) != 2 {
-			return fmt.Errorf("il comando 'p' deve essere seguito da una stringa in formato binario.")
+			return fmt.Errorf("@_@^ il comando 'p' deve essere seguito da una stringa in formato binario.")
 		}
 		piano.StampaAutomiWithPrefix(args[1])
 	case "e":
 		if len(args) != 4 {
-			return fmt.Errorf("il comando 'e' deve essere seguito da due coordinate e una stringa in formato binario.")
+			return fmt.Errorf("@_@^ il comando 'e' deve essere seguito da due coordinate e una stringa in formato binario.")
 		}
 		x, _ := strconv.Atoi(args[1])
 		y, _ := strconv.Atoi(args[2])
 		key := [2]int{x, y}
 		target, err := piano.OttieniAutoma(args[3])
-		if err != nil || !piano.EsistePercorso(target.Posizione, key) {
-			fmt.Println("NO")
+		if err != nil {
+			return fmt.Errorf("@_@^ Automa non trovato.")
+		}
+		if piano.EsistePercorso(target.Posizione, key) {
+			fmt.Println("SI")
 		} else {
 			fmt.Println("NO")
 		}
 	case "f":
 		return nil
 	default:
-		return fmt.Errorf("Comando non valido")
+		return fmt.Errorf("@_@^ Comando non valido")
 	}
 
 	return nil

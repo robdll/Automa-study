@@ -1,6 +1,9 @@
 package entita
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type Ostacolo struct {
 	AngoloBassoSinistro [2]int // Coordinate (x0, y0)
@@ -17,18 +20,17 @@ func (r *Ostacolo) Stampa() {
 	)
 }
 
+func (p *Piano) AggiungiOstacolo(a, b, c, d string) {
+	// Converte le stringhe in interi
+	x0, _ := strconv.Atoi(a)
+	y0, _ := strconv.Atoi(b)
+	x1, _ := strconv.Atoi(c)
+	y1, _ := strconv.Atoi(d)
 
-func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
-	// Controlla che non ci siano automi nell'area del rettangolo
-	for x := x0; x <= x1; x++ {
-		for y := y0; y <= y1; y++ {
-			key := [2]int{x, y}
-			if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
-				if _, ok := entities[0].(*Automa); ok {
-					ConditionalOutput("Impossibile posizionare ostacolo in quella posizione.")
-					return
-				}
-			}
+	// Non procedere oltre se esiste un automa dentro i limiti dell'ostacolo
+	for _, automa := range *p.Automi {
+		if automa.Posizione[0] >= x0 && automa.Posizione[0] <= x1 && automa.Posizione[1] >= y0 && automa.Posizione[1] <= y1 {
+			return
 		}
 	}
 
@@ -44,14 +46,13 @@ func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
 	// Aggiorna la mappa del piano
 	for x := x0; x <= x1; x++ {
 		for y := y0; y <= y1; y++ {
-			key := [2]int{x, y}
+			key := GetKeyFromValues(x, y)
+			// Se la chiave non esiste, crea una nuova slice
 			if _, exists := (*p.Mappa)[key]; !exists {
 				(*p.Mappa)[key] = []interface{}{}
 			}
+			// Aggiungi l'ostacolo alla slice
 			(*p.Mappa)[key] = append((*p.Mappa)[key], &newOstacolo)
 		}
 	}
-	ConditionalOutput(
-		"Ostacolo creato: (", x0, ",",y0,") -> (", x1, ",",y1,")",
-	)
 }

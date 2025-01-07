@@ -2,19 +2,9 @@ package entita
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 )
-
-
-var Silent = true
-
-func ConditionalOutput(message ...interface{}) {
-	if !Silent {
-		fmt.Println(message...)
-	}
-}
 
 func GetManhattanDistance(a, b [2]int) int {
 	return Abs(a[0]-b[0]) + Abs(a[1]-b[1])
@@ -43,89 +33,24 @@ func PrintHelp() {
 	fmt.Println("  h                   		- Stampa questo messaggio.")
 }
 
-
-func Esegui(piano Piano, input string) {
-	args := strings.Fields(input)
-	
-	cmd := args[0]
-	switch cmd {
-	case "h":
-		PrintHelp()
-	case "c":
-		piano.ResettaPiano()
-	case "s":
-		if len(args) != 3 {
-			fmt.Errorf("@_@^ Il comando 's' deve essere seguito da due coordinate.")
-		}
-		x, err1 := strconv.Atoi(args[1])
-		y, err2 := strconv.Atoi(args[2])
-		if err1 != nil || err2 != nil {
-			fmt.Errorf("@_@^ Coordinate non valide.")
-		}
-		piano.Stato(x, y)
-	case "G":
-		piano.StampaGrafica()
-	case "S":
-		piano.Stampa()
-	case "a":
-		if len(args) != 4 {
-			fmt.Errorf("@_@^ Il comando 'a' deve essere seguito da due coordinate e una una stringa in formato binario.")
-		}
-		x, err1 := strconv.Atoi(args[1])
-		y, err2 := strconv.Atoi(args[2])
-		if err1 != nil || err2 != nil {
-			fmt.Errorf("@_@^ coordinate non valide.")
-		}
-		piano.PosizionaAutoma(x, y, args[3])
-	case "o":
-		if len(args) != 5 {
-			fmt.Errorf("@_@^ Il comando 'o' deve essere seguito da quattro coordinate.")
-		}
-		x0, _ := strconv.Atoi(args[1])
-		y0, _ := strconv.Atoi(args[2])
-		x1, _ := strconv.Atoi(args[3])
-		y1, _ := strconv.Atoi(args[4])
-		piano.AggiungiOstacolo(x0, y0, x1, y1)
-	case "r":
-		if len(args) != 4 {
-			fmt.Errorf("@_@^ Il comando 'r' deve essere seguito da 2 coordinate e una una stringa in formato binario.")
-		}
-		x, _ := strconv.Atoi(args[1])
-		y, _ := strconv.Atoi(args[2])
-		piano.Richiamo(x, y, args[3])
-	case "p":
-		if len(args) != 2 {
-			fmt.Errorf("@_@^ Il comando 'p' deve essere seguito da una stringa in formato binario.")
-		}
-		piano.StampaAutomiWithPrefix(args[1])
-	case "e":
-		if len(args) != 4 {
-			fmt.Errorf("@_@^ Il comando 'e' deve essere seguito da due coordinate e una stringa in formato binario.")
-		}
-		x, _ := strconv.Atoi(args[1])
-		y, _ := strconv.Atoi(args[2])
-		key := [2]int{x, y}
-		target, err := piano.OttieniAutoma(args[3])
-		if err != nil {
-			fmt.Errorf("@_@^ Automa non trovato.")
-		}
-		if piano.EsistePercorso(target.Posizione, key) {
-			fmt.Println("SI")
-		} else {
-			fmt.Println("NO")
-		}
-	case "f":
-		os.Exit(0)
-	default:
-		fmt.Errorf("@_@^ Comando non riconosciuto.")
-	}
+func GetKeyFromValues(x, y int) string {
+	return strconv.Itoa(x) + "-" + strconv.Itoa(y)
 }
+
+func GetValuesFromKey(key string) [2]int {
+	split := strings.Split(key, "-")
+	x, _ := strconv.Atoi(split[0])
+	y, _ := strconv.Atoi(split[1])
+	return [2]int{x, y}
+}
+
 
 // Stampa il piano graficamente sulla console
 func (p *Piano) StampaGrafica() {
 	var minX, maxX, minY, maxY int
 	undefinedValue := true
-	for pos := range *p.Mappa {
+	for key := range *p.Mappa {
+		pos := GetValuesFromKey(key)
 		if undefinedValue {
 			minX, maxX, minY, maxY = pos[0], pos[0], pos[1], pos[1]
 			undefinedValue = false
@@ -149,7 +74,7 @@ func (p *Piano) StampaGrafica() {
 	for y := maxY; y >= minY; y-- {
 		fmt.Printf("%2d | ", y)
 		for x := minX; x <= maxX; x++ {
-			key := [2]int{x, y}
+			key := GetKeyFromValues(x, y)
 			if entities, ok := (*p.Mappa)[key]; ok {
 				switch entities[0].(type) {
 				case *Automa:

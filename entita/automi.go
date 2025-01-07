@@ -13,12 +13,11 @@ func (a *Automa) Stampa() {
 	fmt.Printf("%s: %d,%d\n", a.Nome, a.Posizione[0], a.Posizione[1])
 }
 
-func (p *Piano) PosizionaAutoma(x, y int, nome string) {
-	key := [2]int{x, y}
+func (p *Piano) PosizionaAutoma(x, y string, nome string) {
+	key := x + "-" + y
 
 	// Controlla l'esistenza di un Ostacolo nella posizione (x, y)
 	if p.isOstacolo(key) {
-		ConditionalOutput("Impossibile posizionare automa in quella posizione.")
 		return
 	}
 
@@ -33,14 +32,13 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 		// Crea un nuovo Automa
 		newAutoma := &Automa{
 			Nome:	nome,
-			Posizione: key,
+			Posizione: GetValuesFromKey(key),
 		}
 		// Aggiungi l'Automa alla mappa e alla lista degli automi
 		(*p.Automi)[nome] = newAutoma
 		(*p.Mappa)[key] = append((*p.Mappa)[key], newAutoma)
-		ConditionalOutput("Automa creato.")
 	} else {
-		oldKey := automaToPlace.Posizione
+		oldKey := GetKeyFromValues(automaToPlace.Posizione[0], automaToPlace.Posizione[1])
 		for index, target := range (*p.Mappa)[oldKey] {
 			if target == automaToPlace {
 				// Rimuovi l'Automa dalla vecchia posizione
@@ -53,8 +51,7 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 			}
 		}
 		// Aggiorna la posizione dell'Automa e la mappa
-		automaToPlace.Posizione = [2]int{x, y}
+		automaToPlace.Posizione = GetValuesFromKey(key)
 		(*p.Mappa)[key] = append((*p.Mappa)[key], automaToPlace)
-		ConditionalOutput("Automa spostato.")
 	}
 }

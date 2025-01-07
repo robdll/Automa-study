@@ -34,11 +34,11 @@ func PrintHelp() {
 }
 
 func GetKeyFromValues(x, y int) string {
-	return strconv.Itoa(x) + "-" + strconv.Itoa(y)
+	return strconv.Itoa(x) + "_" + strconv.Itoa(y)
 }
 
 func GetValuesFromKey(key string) [2]int {
-	split := strings.Split(key, "-")
+	split := strings.Split(key, "_")
 	x, _ := strconv.Atoi(split[0])
 	y, _ := strconv.Atoi(split[1])
 	return [2]int{x, y}

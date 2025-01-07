@@ -30,7 +30,7 @@ func (p *Piano) ResettaPiano() {
 }
 
 func (p *Piano) Stato(x, y string) {
-	key := x + "-" + y
+	key := x + "_" + y
 	if entities, exists := (*p.Mappa)[key]; exists {
 		switch entities[0].(type) {
 		case *Automa:
@@ -69,7 +69,7 @@ func (p *Piano) StampaAutomiWithPrefix(prefix string) {
 func (p *Piano) Richiamo(x, y string, nome string) {
 
 	// Chiave e posizione del richiamo
-	key := x + "-" + y
+	key := x + "_" + y
 	destination := GetValuesFromKey(key)
 
 	// Se è presente un ostacolo o un automa alla posizione di arrivo, allora non serve fare altro

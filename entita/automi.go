@@ -14,7 +14,7 @@ func (a *Automa) Stampa() {
 }
 
 func (p *Piano) PosizionaAutoma(x, y string, nome string) {
-	key := x + "-" + y
+	key := x + "_" + y
 
 	// Controlla l'esistenza di un Ostacolo nella posizione (x, y)
 	if p.isOstacolo(key) {

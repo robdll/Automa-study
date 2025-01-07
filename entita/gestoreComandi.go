@@ -32,7 +32,7 @@ func Esegui(piano Piano, input string) {
 	case "p":
 		piano.StampaAutomiWithPrefix(args[1])
 	case "e":
-		key := GetValuesFromKey(args[1] + "-" + args[2])
+		key := GetValuesFromKey(args[1] + "_" + args[2])
 		target, _ := piano.OttieniAutoma(args[3])
 		if piano.EsistePercorso(target.Posizione, key) {
 			fmt.Println("SI")

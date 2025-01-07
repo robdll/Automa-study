@@ -23,7 +23,7 @@ func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
 	for x := x0; x <= x1; x++ {
 		for y := y0; y <= y1; y++ {
 			key := [2]int{x, y}
-			if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+			if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
 				if _, ok := entities[0].(*Automa); ok {
 					ConditionalOutput("Impossibile posizionare ostacolo in quella posizione.")
 					return
@@ -39,16 +39,16 @@ func (p *Piano) AggiungiOstacolo(x0, y0, x1, y1 int) {
 	}
 
 	// Aggiungi l'ostacolo alla lista degli ostacoli
-	p.Ostacoli = append(p.Ostacoli, newOstacolo)
+	*p.Ostacoli = append(*p.Ostacoli, newOstacolo)
 
 	// Aggiorna la mappa del piano
 	for x := x0; x <= x1; x++ {
 		for y := y0; y <= y1; y++ {
 			key := [2]int{x, y}
-			if _, exists := p.Mappa[key]; !exists {
-				p.Mappa[key] = []interface{}{}
+			if _, exists := (*p.Mappa)[key]; !exists {
+				(*p.Mappa)[key] = []interface{}{}
 			}
-			p.Mappa[key] = append(p.Mappa[key], &newOstacolo)
+			(*p.Mappa)[key] = append((*p.Mappa)[key], &newOstacolo)
 		}
 	}
 	ConditionalOutput(

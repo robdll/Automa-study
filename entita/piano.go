@@ -6,29 +6,35 @@ import (
 	"strings"
 )
 
+
 type Piano struct {
-	Automi    map[string]*Automa
-	Ostacoli  []Ostacolo
-	Mappa     map[[2]int][]interface{}
+	Automi    *map[string]*Automa
+	Ostacoli  *[]Ostacolo
+	Mappa     *map[[2]int][]interface{}
 }
 
-func Crea() *Piano {
+func NewPiano() Piano {
 	ConditionalOutput("Piano creato.")
-	return &Piano{
-		Automi:   make(map[string]*Automa),
-		Ostacoli: []Ostacolo{},
-		Mappa:    make(map[[2]int][]interface{}),
+	automi := make(map[string]*Automa)
+	ostacoli := []Ostacolo{}
+	mappa := make(map[[2]int][]interface{})
+	return Piano{
+		Automi:   &automi,
+		Ostacoli: &ostacoli,
+		Mappa:    &mappa,
 	}
 }
 
-func NewPiano() *Piano {
-	return Crea()
+func (p *Piano) ResettaPiano() {
+	*p.Automi = make(map[string]*Automa)
+	*p.Ostacoli = []Ostacolo{}
+	*p.Mappa = make(map[[2]int][]interface{})
 }
 
 func (p *Piano) Stato(x, y int) {
 	ConditionalOutput("Stato del piano in posizione: (",x,",",y, ")")
 	key := [2]int{x, y}
-	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+	if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
 		switch entities[0].(type) {
 		case *Automa:
 			fmt.Println("A")
@@ -41,19 +47,19 @@ func (p *Piano) Stato(x, y int) {
 }
 
 func (p *Piano) Stampa() {
-	if len(p.Automi) > 0 {
+	if len(*p.Automi) > 0 {
 		ConditionalOutput("Automi:")
 	}
 	fmt.Println("(")
-	for _, automa := range p.Automi {
+	for _, automa := range *p.Automi {
 		automa.Stampa()
 	}
 	fmt.Println(")")
-	if len(p.Ostacoli) > 0 {
+	if len(*p.Ostacoli) > 0 {
 		ConditionalOutput("Ostacoli:")
 	}
 	fmt.Println("[")
-	for _, ostacolo := range p.Ostacoli {
+	for _, ostacolo := range *p.Ostacoli {
 		ostacolo.Stampa()
 	}
 	fmt.Println("]")
@@ -61,7 +67,7 @@ func (p *Piano) Stampa() {
 
 func (p *Piano) StampaAutomiWithPrefix(prefix string) {
 	fmt.Println("(")
-	for _, automa := range p.Automi {
+	for _, automa := range *p.Automi {
 		if strings.HasPrefix(automa.Nome, prefix) {
 			automa.Stampa()
 		}
@@ -76,7 +82,7 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 	key := [2]int{x, y}
 
 	// Se è presente un ostacolo o un automa non fare nulla
-	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+	if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
 		ConditionalOutput("Richiamo", nome, "ignorato, posizione occupata")
 		return
 	}
@@ -85,7 +91,7 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 	distances := []int{}
 
 	// Considera tutti gli automi del piano
-	for _, automa := range p.Automi {
+	for _, automa := range *p.Automi {
 
 		// Se l'automa non ha come prefisso il nome del segnale non far nulla 
 		if !strings.HasPrefix(automa.Nome, nome) {
@@ -122,7 +128,7 @@ func (p *Piano) Richiamo(x, y int, nome string) {
 }
 
 func (p *Piano) isOstacolo(key [2]int) bool {
-	if entities, exists := p.Mappa[key]; exists && len(entities) > 0 {
+	if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
 		if _, ok := entities[0].(*Ostacolo); ok {
 			return true
 		}
@@ -194,7 +200,7 @@ func (p *Piano) EsistePercorso(pointA, pointB [2]int) bool {
 }
 
 func (p *Piano) OttieniAutoma(name string) (*Automa, error) {
-	automa, exists := p.Automi[name]
+	automa, exists := (*p.Automi)[name]
 	if !exists {
 		return nil, fmt.Errorf("Automa '%s' non trovato", name)
 	}

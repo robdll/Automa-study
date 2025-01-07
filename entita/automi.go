@@ -23,8 +23,8 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 	}
 
 	// Inizializza p.Mappa[key] alla nuova posizione se necessario
-	if _, exists := p.Mappa[key]; !exists {
-		p.Mappa[key] = []interface{}{}
+	if _, exists := (*p.Mappa)[key]; !exists {
+		(*p.Mappa)[key] = []interface{}{}
 	}
 
 	// Cerca tra gli automi del piano se ne esiste uno con il nome fornito
@@ -36,25 +36,25 @@ func (p *Piano) PosizionaAutoma(x, y int, nome string) {
 			Posizione: key,
 		}
 		// Aggiungi l'Automa alla mappa e alla lista degli automi
-		p.Automi[nome] = newAutoma
-		p.Mappa[key] = append(p.Mappa[key], newAutoma)
+		(*p.Automi)[nome] = newAutoma
+		(*p.Mappa)[key] = append((*p.Mappa)[key], newAutoma)
 		ConditionalOutput("Automa creato.")
 	} else {
 		oldKey := automaToPlace.Posizione
-		for index, target := range p.Mappa[oldKey] {
+		for index, target := range (*p.Mappa)[oldKey] {
 			if target == automaToPlace {
 				// Rimuovi l'Automa dalla vecchia posizione
-				p.Mappa[oldKey] = append(p.Mappa[oldKey][:index], p.Mappa[oldKey][index+1:]...)
+				(*p.Mappa)[oldKey] = append((*p.Mappa)[oldKey][:index], (*p.Mappa)[oldKey][index+1:]...)
 				// Cancella la chiave se non ci sono più entità in quella posizione
-				if len(p.Mappa[oldKey]) == 0 {
-					delete(p.Mappa, oldKey)
+				if len((*p.Mappa)[oldKey]) == 0 {
+					delete((*p.Mappa), oldKey)
 				}
 				break
 			}
 		}
 		// Aggiorna la posizione dell'Automa e la mappa
 		automaToPlace.Posizione = [2]int{x, y}
-		p.Mappa[key] = append(p.Mappa[key], automaToPlace)
+		(*p.Mappa)[key] = append((*p.Mappa)[key], automaToPlace)
 		ConditionalOutput("Automa spostato.")
 	}
 }

@@ -31,16 +31,16 @@ func (p *Piano) ResettaPiano() {
 
 func (p *Piano) Stato(x, y string) {
 	key := x + "_" + y
-	if entities, exists := (*p.Mappa)[key]; exists {
-		switch entities[0].(type) {
-		case *Automa:
-			fmt.Println("A")
-		case *Ostacolo:
-			fmt.Println("O")
-		}
-	} else {
-		fmt.Println("E")
+	if _, exists := (*p.Mappa)[key]; exists {
+		fmt.Println("A")
+		return
+	} 
+	coords := GetValuesFromKey(key)
+	if p.isOstacolo(coords[0], coords[1]) {
+		fmt.Println("O")
+		return
 	}
+	fmt.Println("E")
 }
 
 func (p *Piano) Stampa() {
@@ -119,9 +119,10 @@ func (p *Piano) Richiamo(x, y string, nome string) {
 	}
 }
 
-func (p *Piano) isOstacolo(key string) bool {
-	if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
-		if _, ok := entities[0].(*Ostacolo); ok {
+func (p *Piano) isOstacolo(x, y int) bool {
+	for _, ostacolo := range *p.Ostacoli {
+		if x >= ostacolo.AngoloBassoSinistro[0] && x <= ostacolo.AngoloAltoDestro[0] &&
+			y >= ostacolo.AngoloBassoSinistro[1] && y <= ostacolo.AngoloAltoDestro[1] {
 			return true
 		}
 	}
@@ -183,8 +184,7 @@ func (p *Piano) EsistePercorso(pointA, pointB [2]int) bool {
 			* 1) è già stato visitato,
 			* 2) è un ostacolo,
 			* 3) il vicino è fuori dai limiti del movimento. */
-			key := GetKeyFromValues(neighbour[0], neighbour[1])
-			if visited[neighbour] || p.isOstacolo(key) || (outsideHorizontalLimit || outsideVerticalLimit)  {
+			if visited[neighbour] || p.isOstacolo(neighbour[0], neighbour[1]) || (outsideHorizontalLimit || outsideVerticalLimit)  {
 				continue
 			}
 

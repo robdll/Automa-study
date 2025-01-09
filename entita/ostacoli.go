@@ -43,16 +43,4 @@ func (p *Piano) AggiungiOstacolo(a, b, c, d string) {
 	// Aggiungi l'ostacolo alla lista degli ostacoli
 	*p.Ostacoli = append(*p.Ostacoli, newOstacolo)
 
-	// Aggiorna la mappa del piano
-	for x := x0; x <= x1; x++ {
-		for y := y0; y <= y1; y++ {
-			key := GetKeyFromValues(x, y)
-			// Se la chiave non esiste, crea una nuova slice
-			if _, exists := (*p.Mappa)[key]; !exists {
-				(*p.Mappa)[key] = []interface{}{}
-			}
-			// Aggiungi l'ostacolo alla slice
-			(*p.Mappa)[key] = append((*p.Mappa)[key], &newOstacolo)
-		}
-	}
 }

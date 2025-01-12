@@ -14,7 +14,7 @@ func (a *Automa) Stampa() {
 }
 
 func (p *Piano) PosizionaAutoma(x, y string, nome string) {
-	key := x + "_" + y
+	key := [2]int{GetInt(x), GetInt(y)}
 
 	// Controlla l'esistenza di un Ostacolo nella posizione (x, y)
 	if p.isOstacolo(key) {
@@ -32,13 +32,13 @@ func (p *Piano) PosizionaAutoma(x, y string, nome string) {
 		// Crea un nuovo Automa
 		newAutoma := &Automa{
 			Nome:	nome,
-			Posizione: GetValuesFromKey(key),
+			Posizione: key,
 		}
 		// Aggiungi l'Automa alla mappa e alla lista degli automi
 		(*p.Automi)[nome] = newAutoma
 		(*p.Mappa)[key] = append((*p.Mappa)[key], newAutoma)
 	} else {
-		oldKey := GetKeyFromValues(automaToPlace.Posizione[0], automaToPlace.Posizione[1])
+		oldKey := automaToPlace.Posizione
 		for index, target := range (*p.Mappa)[oldKey] {
 			if target == automaToPlace {
 				// Rimuovi l'Automa dalla vecchia posizione
@@ -51,7 +51,7 @@ func (p *Piano) PosizionaAutoma(x, y string, nome string) {
 			}
 		}
 		// Aggiorna la posizione dell'Automa e la mappa
-		automaToPlace.Posizione = GetValuesFromKey(key)
+		automaToPlace.Posizione = key
 		(*p.Mappa)[key] = append((*p.Mappa)[key], automaToPlace)
 	}
 }

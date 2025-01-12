@@ -49,8 +49,7 @@ func GetValuesFromKey(key string) [2]int {
 func (p *Piano) StampaGrafica() {
 	var minX, maxX, minY, maxY int
 	undefinedValue := true
-	for key := range *p.Mappa {
-		pos := GetValuesFromKey(key)
+	for pos := range *p.Mappa {
 		if undefinedValue {
 			minX, maxX, minY, maxY = pos[0], pos[0], pos[1], pos[1]
 			undefinedValue = false
@@ -74,7 +73,7 @@ func (p *Piano) StampaGrafica() {
 	for y := maxY; y >= minY; y-- {
 		fmt.Printf("%2d | ", y)
 		for x := minX; x <= maxX; x++ {
-			key := GetKeyFromValues(x, y)
+			key := [2]int{x, y}
 			if entities, ok := (*p.Mappa)[key]; ok {
 				switch entities[0].(type) {
 				case *Automa:
@@ -99,4 +98,9 @@ func (p *Piano) StampaGrafica() {
 		fmt.Printf("%2d ", x)
 	}
 	fmt.Println()
+}
+
+func GetInt(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
 }

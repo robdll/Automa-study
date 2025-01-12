@@ -9,13 +9,13 @@ import (
 type Piano struct {
 	Automi    *map[string]*Automa
 	Ostacoli  *[]Ostacolo
-	Mappa     *map[string][]interface{}
+	Mappa     *map[[2]int][]interface{}
 }
 
 func NewPiano() Piano {
 	automi := make(map[string]*Automa)
 	ostacoli := []Ostacolo{}
-	mappa := make(map[string][]interface{})
+	mappa := make(map[[2]int][]interface{})
 	return Piano{
 		Automi:   &automi,
 		Ostacoli: &ostacoli,
@@ -26,11 +26,11 @@ func NewPiano() Piano {
 func (p *Piano) ResettaPiano() {
 	*p.Automi = make(map[string]*Automa)
 	*p.Ostacoli = []Ostacolo{}
-	*p.Mappa = make(map[string][]interface{})
+	*p.Mappa = make(map[[2]int][]interface{})
 }
 
 func (p *Piano) Stato(x, y string) {
-	key := x + "_" + y
+	key := [2]int{GetInt(x), GetInt(y)}
 	if entities, exists := (*p.Mappa)[key]; exists {
 		switch entities[0].(type) {
 		case *Automa:
@@ -69,8 +69,7 @@ func (p *Piano) StampaAutomiWithPrefix(prefix string) {
 func (p *Piano) Richiamo(x, y string, nome string) {
 
 	// Chiave e posizione del richiamo
-	key := x + "_" + y
-	destination := GetValuesFromKey(key)
+	key := [2]int{GetInt(x), GetInt(y)}
 
 	// Se è presente un ostacolo o un automa alla posizione di arrivo, allora non serve fare altro
 	if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
@@ -88,7 +87,7 @@ func (p *Piano) Richiamo(x, y string, nome string) {
 		}
 
 		// Calcola la distanza Manhattan dell'automa corrente
-		distance := GetManhattanDistance(automa.Posizione, destination)
+		distance := GetManhattanDistance(automa.Posizione, key)
 		
 		// Crea la slice se non esistono ancora automi con la stessa distanza di Manhattan
 		if _, exists := automasByDistance[distance]; !exists {
@@ -111,7 +110,7 @@ func (p *Piano) Richiamo(x, y string, nome string) {
 	for i := 0; i < len(distances) && !automaMoved; i++ {
 		automasGroup := automasByDistance[distances[i]]
 		for _, automa := range automasGroup {
-			if p.EsistePercorso(automa.Posizione, destination) {
+			if p.EsistePercorso(automa.Posizione, key) {
 				p.PosizionaAutoma(x, y, automa.Nome)
 				automaMoved = true
 			}
@@ -119,7 +118,7 @@ func (p *Piano) Richiamo(x, y string, nome string) {
 	}
 }
 
-func (p *Piano) isOstacolo(key string) bool {
+func (p *Piano) isOstacolo(key [2]int) bool {
 	if entities, exists := (*p.Mappa)[key]; exists && len(entities) > 0 {
 		if _, ok := entities[0].(*Ostacolo); ok {
 			return true
@@ -183,8 +182,7 @@ func (p *Piano) EsistePercorso(pointA, pointB [2]int) bool {
 			* 1) è già stato visitato,
 			* 2) è un ostacolo,
 			* 3) il vicino è fuori dai limiti del movimento. */
-			key := GetKeyFromValues(neighbour[0], neighbour[1])
-			if visited[neighbour] || p.isOstacolo(key) || (outsideHorizontalLimit || outsideVerticalLimit)  {
+			if visited[neighbour] || p.isOstacolo(neighbour) || (outsideHorizontalLimit || outsideVerticalLimit)  {
 				continue
 			}
 
